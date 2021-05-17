@@ -13,7 +13,8 @@
 #
 # For CO2, the calculation accounts for carbonate equilbrium according to 
 # Rheadspace.R by Marce, Kim, and Prairie as in 
-# Koschorreck, M., Y.T. Prairie, J. Kim, and R. Marcé. 2020. Technical note: CO2 is not like CH4 – limits of the headspace method to analyse pCO2 in water. Biogeosciences, 2021
+# Koschorreck, M., Y.T. Prairie, J. Kim, and R. Marcé. 2020. 
+# Technical note: CO2 is not like CH4 – limits of the headspace method to analyse pCO2 in water. Biogeosciences, 2021
 # and https://github.com/icra/headspace/blob/master/Rheadspace.R.
 # This function modifies the Rheadspace function by using only freshwater constants  
 # and updates the Henry’s law constants for CO2 according to Sander 2015.
@@ -75,10 +76,9 @@ Rheadspace_GHG <-  function(...){
     Bar.pressure = arguments[[20]] #Barometric pressure at field conditions in kPa. 101.325 kPa = 1 atm   
     site = arguments[[21]]
   } else {
-    stop("Input dataframe error", call.=FALSE)
+    stop("Input error", call.=FALSE)
   }
   
-  #initialization of variables
   pGHG_orig <- data.frame(matrix(NA,length(mCO2_headspace.paired),19))
   names(pGHG_orig) <- c("Sample.ID",
                         "pCH4.uatm.paired", 
@@ -132,14 +132,12 @@ Rheadspace_GHG <-  function(...){
     Kh.n2o = 0.00024*exp(2700*(1/(273.15+temp_eq[i])-1/298.15))*101325/1000 # mol/L/atm equilibration conditions
     Kh2.n2o = 0.00024*exp(2700*(1/(273.15+temp_insitu[i])-1/298.15))*101325/1000 # mol/L/atm original conditions
     
-    HS.ratio <- vol_gas[i]/vol_water[i] #Headspace:water ratio
+    HS.ratio <- vol_gas[i]/vol_water[i] 
     
     ##### CH4 ####
-    #concentration and total mass in the water sample assuming ideal gas from the pCH4 measured at the headspace
     CH4_solution <- mCH4_eq[i]/1000000*Kh.ch4 #mol/L
     CH4_solution_mass <- CH4_solution * vol_water[i]/1000 #mol
     
-    #mass of CH4 in the measured headspace
     final_C_headspace_mass.ch4 <- mCH4_eq[i]/1000000*(vol_gas[i]/1000) / (R * (temp_eq[i]+273.15)) #mol
     
     mols_headspace.ch4.paired <- mCH4_headspace.paired[i]/1000000*(vol_gas[i]/1000)/(R * (temp_eq[i]+273.15)) #mol PV / RT = n
@@ -197,18 +195,15 @@ Rheadspace_GHG <-  function(...){
     pGHG_orig[i,13] <- co2.median*1000000
     
     #N2O####
-    #concentration and total mass in the water sample assuming ideal gas from the pN2O measured at the headspace
     N2O_solution <- mN2O_eq[i]/1000000*Kh.n2o #mol/L
     N2O_solution_mass <- N2O_solution * vol_water[i]/1000 #mol
     
-    #mass of N2O in the measured headspace
     final_N_headspace_mass <- mN2O_eq[i]/1000000*(vol_gas[i]/1000) / (R * (temp_eq[i]+273.15)) #mol
     
     mols_headspace.n2o.paired <- mN2O_headspace.paired[i]/1000000*(vol_gas[i]/1000)/(R * (temp_eq[i]+273.15)) #mol PV / RT = n
     mols_headspace.n2o.smoothed <- mN2O_headspace.smoothed[i]/1000000*(vol_gas[i]/1000)/(R * (temp_eq[i]+273.15)) #mol PV / RT = n
     mols_headspace.n2o.median <- mN2O_headspace.median[i]/1000000*(vol_gas[i]/1000)/(R * (temp_eq[i]+273.15)) #mol PV / RT = n
     
-    #implication: mass, concentration, and partial pressure of N2O in the original sample (aount in sample and headspace after equilibration minus original mass in the headspace)
     Sample_N2O_mass.paired <- N2O_solution_mass + final_N_headspace_mass - mols_headspace.n2o.paired #mol
     Sample_N2O_mass.smoothed <- N2O_solution_mass + final_N_headspace_mass - mols_headspace.n2o.smoothed #mol
     Sample_N2O_mass.median <- N2O_solution_mass + final_N_headspace_mass - mols_headspace.n2o.median #mol
@@ -225,6 +220,6 @@ Rheadspace_GHG <-  function(...){
   }
   
   
-  return(pGHG_orig) #Output data frame
+  return(pGHG_orig) 
   
 }
